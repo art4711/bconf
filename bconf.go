@@ -64,7 +64,7 @@ func (bc Bconf)GetNode(k ...string) Bconf {
 	n := bc.get(k...)
 	switch (n.(type)) {
 	case Bconf:
-		return n
+		return n.(Bconf)
 	}
 	return nil
 }

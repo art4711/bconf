@@ -62,7 +62,11 @@ func (bc Bconf) get(k ...string) interface{} {
 
 func (bc Bconf)GetNode(k ...string) Bconf {
 	n := bc.get(k...)
-	return Bconf(n.(Bconf))
+	switch (n.(type)) {
+	case Bconf:
+		return n
+	}
+	return nil
 }
 
 func (bc Bconf)GetString(k ...string) string {

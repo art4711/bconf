@@ -7,12 +7,7 @@ import (
 
 type Bconf map[string]interface{}
 
-type sortednode []struct {
-	k string
-	v interface{}
-}
-
-func (bc *Bconf)LoadJson(js []byte) error {
+func (bc *Bconf) LoadJson(js []byte) error {
 	err := json.Unmarshal(js, bc)
 
 	if bc != nil && len(*bc) > 0 {
@@ -28,9 +23,9 @@ func (bc *Bconf)LoadJson(js []byte) error {
  */
 func normalize(bc Bconf) Bconf {
 	nb := make(Bconf)
-	for k, v := range(bc) {
+	for k, v := range bc {
 		var nv interface{}
-		switch (v.(type)) {
+		switch v.(type) {
 		case map[string]interface{}:
 			nv = normalize(Bconf(v.(map[string]interface{})))
 		default:
@@ -52,7 +47,7 @@ func (bc Bconf) get(k ...string) interface{} {
 		return n
 	}
 
-	switch (n.(type)) {
+	switch n.(type) {
 	case Bconf:
 		return n.(Bconf).get(k[1:]...)
 	}
@@ -60,21 +55,21 @@ func (bc Bconf) get(k ...string) interface{} {
 	return nil
 }
 
-func (bc Bconf)GetNode(k ...string) Bconf {
+func (bc Bconf) GetNode(k ...string) Bconf {
 	n := bc.get(k...)
-	switch (n.(type)) {
+	switch n.(type) {
 	case Bconf:
 		return n.(Bconf)
 	}
 	return nil
 }
 
-func (bc Bconf)GetString(k ...string) string {
+func (bc Bconf) GetString(k ...string) string {
 	if len(k) == 0 {
 		return ""
 	}
 	n := bc[k[0]]
-	switch (n.(type)) {
+	switch n.(type) {
 	case string:
 		if len(k) == 1 {
 			return n.(string)
@@ -86,13 +81,18 @@ func (bc Bconf)GetString(k ...string) string {
 	return ""
 }
 
-func (bc Bconf)ForeachVal(f func(k,v string)) {
-	for k, v := range(bc) {
-		switch(v.(type)) {
+func (bc Bconf) ForeachVal(f func(k, v string)) {
+	for k, v := range bc {
+		switch v.(type) {
 		case string:
 			f(k, v.(string))
 		}
 	}
+}
+
+type sortednode []struct {
+	k string
+	v interface{}
 }
 
 func (sn sortednode) Len() int {
@@ -110,19 +110,19 @@ func (sn sortednode) Swap(i, j int) {
 func (bc Bconf) tosortednode() sortednode {
 	sn := make(sortednode, len(bc))
 	i := 0
-	for sn[i].k, sn[i].v = range(bc) {
+	for sn[i].k, sn[i].v = range bc {
 		i++
 	}
 	sort.Sort(sn)
 	return sn
 }
 
-func (bc Bconf)ForeachSorted(f func(k, v string)) {
+func (bc Bconf) ForeachSorted(f func(k, v string)) {
 	sn := bc.tosortednode()
-	for _, s := range(sn) {
-		switch(s.v.(type)) {
+	for _, s := range sn {
+		switch s.v.(type) {
 		case string:
 			f(s.k, s.v.(string))
-		}		
+		}
 	}
 }

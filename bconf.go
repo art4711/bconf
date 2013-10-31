@@ -6,6 +6,12 @@ package bconf
 import (
 	"encoding/json"
 	"sort"
+	"bufio"
+	"os"
+	"strings"
+	"errors"
+	"fmt"
+	"io"
 )
 
 type Bconf map[string]interface{}
@@ -18,6 +24,77 @@ func (bc *Bconf) LoadJson(js []byte) error {
 	}
 
 	return err
+}
+
+// Split function for the scanner. This is what removes comments, whitespace and
+// empty lines and returns just the valid bconf lines.
+func scanLines(data []byte, atEOF bool) (int, []byte, error) {
+	totadvance := 0
+	for true {
+		advance, token, err := bufio.ScanLines(data, atEOF)
+		if advance == 0 || err != nil {
+			return advance, token, err
+		}
+		totadvance += advance
+		// Eat leading whitespace
+		i := 0
+		for ; i < len(token); i++ {
+			if token[i] != ' ' && token[i] != '\t' {
+				break
+			}
+		}
+		token = token[i:]
+
+		// Empty lines and comments.
+		if len(token) == 0 || token[0] == '#' {
+			data = data[advance:]
+			continue
+		}
+		return totadvance, token, nil
+	}
+	return -1, nil, nil
+}
+
+func (bc *Bconf) LoadConfFile(fname string) error {
+	f, err := os.Open(fname)
+	if err != nil {
+		return err
+	}
+	return bc.LoadConfData(f)
+}
+
+func (bc *Bconf) LoadConfData(f io.Reader) error {
+	scanner := bufio.NewScanner(f)
+	scanner.Split(scanLines)
+	for scanner.Scan() {
+		t := scanner.Text()
+		if strings.HasPrefix(t, "include") {
+			incpath := strings.Split(t, " \t")
+			if len(incpath) < 2 {
+				return errors.New(fmt.Sprintf("include without path: %v", t))
+			}
+			bc.LoadConfFile(incpath[len(incpath) - 1])
+		}
+		skv := strings.SplitN(t, "=", 2)
+		if len(skv) != 2 {
+			return errors.New(fmt.Sprintf("malformed bconf line: %v", t))
+		}
+		k, v := skv[0], skv[1]
+		bc.AddValue(strings.Split(k, "."), v)
+		
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}	
+
+	return nil
+}
+
+// Add a value to the Bconf.
+func (bc Bconf) AddValue(k []string, v string) {
+	n := bc.get(true, k[:len(k) - 1]...).(Bconf)
+	lastkey := k[len(k) - 1]
+	n[lastkey] = v
 }
 
 /*
@@ -39,12 +116,20 @@ func normalize(bc Bconf) Bconf {
 	return nb
 }
 
-func (bc Bconf) get(k ...string) interface{} {
+func (bc Bconf) get(alloc bool, k ...string) interface{} {
 	if len(k) == 0 {
 		return bc
 	}
 
-	n := bc[k[0]]
+	n, exists := bc[k[0]]
+
+	if !exists {
+		if !alloc {
+			return nil
+		}
+		bc[k[0]] = make(Bconf)
+		n = bc[k[0]]
+	}
 
 	if len(k) == 1 {
 		return n
@@ -52,14 +137,14 @@ func (bc Bconf) get(k ...string) interface{} {
 
 	switch n.(type) {
 	case Bconf:
-		return n.(Bconf).get(k[1:]...)
+		return n.(Bconf).get(alloc, k[1:]...)
 	}
 
 	return nil
 }
 
 func (bc Bconf) GetNode(k ...string) Bconf {
-	n := bc.get(k...)
+	n := bc.get(false, k...)
 	switch n.(type) {
 	case Bconf:
 		return n.(Bconf)
@@ -72,6 +157,9 @@ func (bc Bconf) GetString(k ...string) string {
 		return ""
 	}
 	n := bc[k[0]]
+	if n == nil {
+		return ""
+	}
 	switch n.(type) {
 	case string:
 		if len(k) == 1 {

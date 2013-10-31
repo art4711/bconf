@@ -1,3 +1,6 @@
+// Copyright 2013 Artur Grabowski. All rights reserved.
+// Use of this source code is governed by a ISC-style
+// license that can be found in the LICENSE file.
 package bconf
 
 import (

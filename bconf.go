@@ -73,3 +73,17 @@ func (bc Bconf) ForeachVal(f func(k, v string)) {
 		}
 	}
 }
+
+// Merge 'src' into 'dst' overwriting values and branches in 'dst'.
+func (dst Bconf) Merge(src Bconf) {
+	for k, v := range src {
+		dv, exists := dst[k]
+		dn, disnode := dv.(Bconf)
+		sn, sisnode := v.(Bconf)
+		if !exists || !disnode || !sisnode {
+			dst[k] = v
+		} else {
+			dn.Merge(sn)
+		}
+	}
+}

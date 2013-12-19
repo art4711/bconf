@@ -104,14 +104,11 @@ func (bc Bconf) AddValue(k []string, v string) {
 func normalize(bc Bconf) Bconf {
 	nb := make(Bconf)
 	for k, v := range bc {
-		var nv interface{}
-		switch v.(type) {
-		case map[string]interface{}:
-			nv = normalize(Bconf(v.(map[string]interface{})))
-		default:
-			nv = v
+		if iv, ok := v.(map[string]interface{}); ok {
+			nb[k] = normalize(iv)
+		} else {
+			nb[k] = v;
 		}
-		nb[k] = nv
 	}
 	return nb
 }
@@ -135,19 +132,16 @@ func (bc Bconf) get(alloc bool, k ...string) interface{} {
 		return n
 	}
 
-	switch n.(type) {
-	case Bconf:
-		return n.(Bconf).get(alloc, k[1:]...)
+	if bn, ok := n.(Bconf); ok {
+		return bn.get(alloc, k[1:]...)
 	}
-
 	return nil
 }
 
 func (bc Bconf) GetNode(k ...string) Bconf {
 	n := bc.get(false, k...)
-	switch n.(type) {
-	case Bconf:
-		return n.(Bconf)
+	if bn, ok := n.(Bconf); ok {
+		return bn
 	}
 	return nil
 }
@@ -160,23 +154,19 @@ func (bc Bconf) GetString(k ...string) string {
 	if n == nil {
 		return ""
 	}
-	switch n.(type) {
-	case string:
-		if len(k) == 1 {
-			return n.(string)
-		}
-		return ""
-	default:
-		return n.(Bconf).GetString(k[1:]...)
+	if bn, ok := n.(Bconf); ok {
+		return bn.GetString(k[1:]...)
+	}
+	if len(k) == 1 {
+		return n.(string)
 	}
 	return ""
 }
 
 func (bc Bconf) ForeachVal(f func(k, v string)) {
 	for k, v := range bc {
-		switch v.(type) {
-		case string:
-			f(k, v.(string))
+		if s, ok := v.(string); ok {
+			f(k, s)
 		}
 	}
 }
@@ -211,9 +201,8 @@ func (bc Bconf) tosortednode() sortednode {
 func (bc Bconf) ForeachSorted(f func(k, v string)) {
 	sn := bc.tosortednode()
 	for _, s := range sn {
-		switch s.v.(type) {
-		case string:
-			f(s.k, s.v.(string))
+		if sv, ok := s.v.(string); ok {
+			f(s.k, sv)
 		}
 	}
 }

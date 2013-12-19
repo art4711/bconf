@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 )
 
+// Populate a Bconf with data from a byte array that contains json. Returns json parsing errors.
 func (bc *Bconf) LoadJson(js []byte) error {
 	err := json.Unmarshal(js, bc)
 

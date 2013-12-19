@@ -37,6 +37,7 @@ func (bc Bconf) get(alloc bool, k ...string) interface{} {
 	return nil
 }
 
+// Get a bconf node under a varargs key
 func (bc Bconf) GetNode(k ...string) Bconf {
 	n := bc.get(false, k...)
 	if bn, ok := n.(Bconf); ok {
@@ -45,6 +46,7 @@ func (bc Bconf) GetNode(k ...string) Bconf {
 	return nil
 }
 
+// Return a string from bconf under a key, returns empty string if key not found.
 func (bc Bconf) GetString(k ...string) string {
 	if len(k) == 0 {
 		return ""
@@ -62,6 +64,8 @@ func (bc Bconf) GetString(k ...string) string {
 	return ""
 }
 
+// Call the callback function for every value (not node) in a Bconf node. The values are unsorted.
+// When the walk has to be sorted, use ForeachSorted instead which is slower.
 func (bc Bconf) ForeachVal(f func(k, v string)) {
 	for k, v := range bc {
 		if s, ok := v.(string); ok {

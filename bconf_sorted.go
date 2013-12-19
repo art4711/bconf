@@ -34,6 +34,8 @@ func (bc Bconf) tosortednode() sortednode {
 	return sn
 }
 
+// Call the callback function for every value (not node) in a Bconf node. The values are sorted on their key.
+// When the walk doesn't need to be sorted, use ForeachVal instead which is faster.
 func (bc Bconf) ForeachSorted(f func(k, v string)) {
 	sn := bc.tosortednode()
 	for _, s := range sn {

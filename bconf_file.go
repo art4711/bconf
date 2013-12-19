@@ -41,6 +41,7 @@ func scanLines(data []byte, atEOF bool) (int, []byte, error) {
 	return -1, nil, nil
 }
 
+// Populate a Bconf with data from the bconf-formatted file provided here as a name.
 func (bc *Bconf) LoadConfFile(fname string) error {
 	f, err := os.Open(fname)
 	if err != nil {
@@ -49,6 +50,7 @@ func (bc *Bconf) LoadConfFile(fname string) error {
 	return bc.LoadConfData(f)
 }
 
+// Populate a Bconf with data from the bconf-formatted io.Reader.
 func (bc *Bconf) LoadConfData(f io.Reader) error {
 	scanner := bufio.NewScanner(f)
 	scanner.Split(scanLines)

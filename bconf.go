@@ -4,44 +4,16 @@
 package bconf
 
 import (
-	"encoding/json"
 	"sort"
 )
 
 type Bconf map[string]interface{}
-
-func (bc *Bconf) LoadJson(js []byte) error {
-	err := json.Unmarshal(js, bc)
-
-	if bc != nil && len(*bc) > 0 {
-		*bc = normalize(*bc)
-	}
-
-	return err
-}
-
 
 // Add a value to the Bconf.
 func (bc Bconf) AddValue(k []string, v string) {
 	n := bc.get(true, k[:len(k) - 1]...).(Bconf)
 	lastkey := k[len(k) - 1]
 	n[lastkey] = v
-}
-
-/*
- * Normalize what we read from json by changing the data types from
- * map[string]interface{} into Bconf
- */
-func normalize(bc Bconf) Bconf {
-	nb := make(Bconf)
-	for k, v := range bc {
-		if iv, ok := v.(map[string]interface{}); ok {
-			nb[k] = normalize(iv)
-		} else {
-			nb[k] = v;
-		}
-	}
-	return nb
 }
 
 func (bc Bconf) get(alloc bool, k ...string) interface{} {

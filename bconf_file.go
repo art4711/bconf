@@ -5,11 +5,11 @@ package bconf
 
 import (
 	"bufio"
-	"os"
-	"strings"
 	"errors"
 	"fmt"
 	"io"
+	"os"
+	"strings"
 )
 
 // Split function for the scanner. This is what removes comments, whitespace and
@@ -61,7 +61,7 @@ func (bc *Bconf) LoadConfData(f io.Reader) error {
 			if len(incpath) < 2 {
 				return errors.New(fmt.Sprintf("include without path: %v", t))
 			}
-			bc.LoadConfFile(incpath[len(incpath) - 1])
+			bc.LoadConfFile(incpath[len(incpath)-1])
 		}
 		skv := strings.SplitN(t, "=", 2)
 		if len(skv) != 2 {
@@ -69,11 +69,11 @@ func (bc *Bconf) LoadConfData(f io.Reader) error {
 		}
 		k, v := skv[0], skv[1]
 		bc.AddValue(strings.Split(k, "."), v)
-		
+
 	}
 	if err := scanner.Err(); err != nil {
 		return err
-	}	
+	}
 
 	return nil
 }

@@ -44,4 +44,3 @@ func (bc Bconf) ForeachSorted(f func(k, v string)) {
 		}
 	}
 }
-

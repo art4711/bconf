@@ -7,8 +7,8 @@ type Bconf map[string]interface{}
 
 // Add a value to the Bconf.
 func (bc Bconf) AddValue(k []string, v string) {
-	n := bc.get(true, k[:len(k) - 1]...).(Bconf)
-	lastkey := k[len(k) - 1]
+	n := bc.get(true, k[:len(k)-1]...).(Bconf)
+	lastkey := k[len(k)-1]
 	n[lastkey] = v
 }
 
@@ -73,4 +73,3 @@ func (bc Bconf) ForeachVal(f func(k, v string)) {
 		}
 	}
 }
-

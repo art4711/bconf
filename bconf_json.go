@@ -28,9 +28,8 @@ func normalize(bc Bconf) Bconf {
 		if iv, ok := v.(map[string]interface{}); ok {
 			nb[k] = normalize(iv)
 		} else {
-			nb[k] = v;
+			nb[k] = v
 		}
 	}
 	return nb
 }
-

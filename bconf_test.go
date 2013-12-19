@@ -1,10 +1,10 @@
 package bconf_test
 
 import (
-	"github.com/art4711/bconf"
-	"testing"
 	"fmt"
+	"github.com/art4711/bconf"
 	"strings"
+	"testing"
 )
 
 var testjson = `{"attr": {"name": {"attrind": "4","attronly": "3","body": "5","id": "0","order": "1","status": "6","suborder": "2"},"order": {"0": "id","1": "order","2": "suborder","3": "attronly","4": "attrind","5": "body","6": "status"}},"conf": {"foo.bar": "17","test.conf": "4711"},"counters": {"attr": {"HEJ": "hej_counter"},"word": {"attr": "attr_counter"}},"opers": {"en": {"AND": "0","NOT": "2","OR": "1","and": "0","not": "2","or": "1"}},"state": {"to_id": "4711"},"stopwords": {"ONE": "","one": ""}}`
@@ -55,7 +55,7 @@ func TestForeachVal(t *testing.T) {
 	foo := make(map[string]string)
 	foo["foo.bar"] = "17"
 	foo["test.conf"] = "4711"
-	n.ForeachVal(func(k,v string) {
+	n.ForeachVal(func(k, v string) {
 		x := foo[k]
 		if x != v {
 			t.Errorf("wrong/missing/repeated k: %v v: %v x: %v", k, v, x)
@@ -68,7 +68,7 @@ func TestForeachSorted(t *testing.T) {
 	bc := lj(t)
 	n := bc.GetNode("attr", "order")
 	i := 0
-	n.ForeachSorted(func(k,v string) {
+	n.ForeachSorted(func(k, v string) {
 		if fmt.Sprint(i) != k {
 			t.Errorf("out of order keys: %v != %v", i, k)
 		}

@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode"
 )
 
 // Split function for the scanner. This is what removes comments, whitespace and
@@ -57,19 +58,21 @@ func (bc *Bconf) LoadConfData(f io.Reader) error {
 	for scanner.Scan() {
 		t := scanner.Text()
 		if strings.HasPrefix(t, "include") {
-			incpath := strings.Split(t, " \t")
-			if len(incpath) < 2 {
-				return errors.New(fmt.Sprintf("include without path: %v", t))
+			incpath := strings.TrimLeftFunc(t[7:], unicode.IsSpace)
+			if incpath == "" {
+				return errors.New(fmt.Sprintf("include without path: '%v'", t))
 			}
-			bc.LoadConfFile(incpath[len(incpath)-1])
+			if err := bc.LoadConfFile(incpath); err != nil {
+				return err
+			}
+		} else {
+			skv := strings.SplitN(t, "=", 2)
+			if len(skv) != 2 {
+				return errors.New(fmt.Sprintf("malformed bconf line: %v", t))
+			}
+			k, v := skv[0], skv[1]
+			bc.AddValue(strings.Split(k, "."), v)
 		}
-		skv := strings.SplitN(t, "=", 2)
-		if len(skv) != 2 {
-			return errors.New(fmt.Sprintf("malformed bconf line: %v", t))
-		}
-		k, v := skv[0], skv[1]
-		bc.AddValue(strings.Split(k, "."), v)
-
 	}
 	if err := scanner.Err(); err != nil {
 		return err

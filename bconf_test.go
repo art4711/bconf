@@ -121,3 +121,12 @@ func TestMerge(t *testing.T) {
 		t.Fatalf("expected mismatch: %v != %v", js, mexpect)
 	}
 }
+
+func BenchmarkJSON(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		bc := make(bconf.Bconf)
+		if err := bc.LoadJson([]byte(testjson)); err != nil {
+			b.Fatalf("LoadJson: %v", err)
+		}		
+	}
+}

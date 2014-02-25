@@ -35,13 +35,12 @@ func (bc *Bconf) LoadJSONReader(r io.Reader) error {
  * map[string]interface{} into Bconf
  */
 func normalize(bc Bconf) Bconf {
-	nb := make(Bconf)
 	for k, v := range bc {
 		if iv, ok := v.(map[string]interface{}); ok {
-			nb[k] = normalize(iv)
+			bc[k] = normalize(iv)
 		} else {
-			nb[k] = v
+			bc[k] = v
 		}
 	}
-	return nb
+	return bc
 }

@@ -5,11 +5,23 @@ package bconf
 
 import (
 	"encoding/json"
+	"io"
 )
 
 // Populate a Bconf with data from a byte array that contains json. Returns json parsing errors.
 func (bc *Bconf) LoadJson(js []byte) error {
 	err := json.Unmarshal(js, bc)
+
+	if bc != nil && len(*bc) > 0 {
+		*bc = normalize(*bc)
+	}
+
+	return err
+}
+
+func (bc *Bconf) LoadJSONReader(r io.Reader) error {
+	d := json.NewDecoder(r)
+	err := d.Decode(bc)
 
 	if bc != nil && len(*bc) > 0 {
 		*bc = normalize(*bc)

@@ -6,7 +6,6 @@ package bconf
 import (
 	"net/http"
 	"net/url"
-	"errors"
 	"fmt"
 )
 
@@ -23,7 +22,7 @@ func (bc *Bconf) LoadHTTP(bconfurl, host, appl string) error {
 		return err
 	}
 	if res.StatusCode != 200 {
-		return errors.New(fmt.Sprintf("bconf.LoadHTTP - response: %v", res.Status))
+		return fmt.Errorf("bconf.LoadHTTP - response: %v", res.Status)
 	}
 	bc.LoadJSONReader(res.Body)
 	res.Body.Close()

@@ -5,7 +5,6 @@ package bconf
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -60,7 +59,7 @@ func (bc *Bconf) LoadConfData(f io.Reader) error {
 		if strings.HasPrefix(t, "include") {
 			incpath := strings.TrimLeftFunc(t[7:], unicode.IsSpace)
 			if incpath == "" {
-				return errors.New(fmt.Sprintf("include without path: '%v'", t))
+				return fmt.Errorf("include without path: '%v'", t)
 			}
 			if err := bc.LoadConfFile(incpath); err != nil {
 				return err
@@ -68,7 +67,7 @@ func (bc *Bconf) LoadConfData(f io.Reader) error {
 		} else {
 			skv := strings.SplitN(t, "=", 2)
 			if len(skv) != 2 {
-				return errors.New(fmt.Sprintf("malformed bconf line: %v", t))
+				return fmt.Errorf("malformed bconf line: %v", t)
 			}
 			k, v := skv[0], skv[1]
 			bc.AddValue(strings.Split(k, "."), v)

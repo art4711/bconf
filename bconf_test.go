@@ -164,6 +164,48 @@ func TestMerge(t *testing.T) {
 	}
 }
 
+type S struct {
+	Str	string	`bconf:"s"`
+	I	int
+	F	float64
+	U	uint
+}
+var unbconf = `
+this.is.s=string
+this.is.i=-4711
+this.is.f=42.0
+this.is.u=4711
+`
+
+func TestUnmarshal(t *testing.T) {
+	bcThis := make(bconf.Bconf)
+	if err := bcThis.LoadConfData(strings.NewReader(unbconf)); err != nil {
+		t.Fatalf("LoadConfData: %v", err)
+	}
+
+	bc := bcThis.GetNode("this", "is")
+	if bc == nil {
+		t.Fatalf("GetNode")
+	}
+
+	var s S
+	if err := bc.Unmarshal(&s); err != nil {
+		t.Fatalf("Unmarshal: %v\n", err)
+	}
+	if s.Str != "string" {
+		t.Fatalf("%v != string\n", s.Str)
+	}
+	if s.I != -4711 {
+		t.Fatalf("%v != -4711\n", s.I)
+	}
+	if s.F != 42.0 {
+		t.Fatalf("%v != 42.0\n", s.F)
+	}
+	if s.U != 4711 {
+		t.Fatalf("%v != 4711\n", s.U)
+	}
+}
+
 func BenchmarkJSON(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		bc := make(bconf.Bconf)

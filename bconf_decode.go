@@ -10,16 +10,15 @@ import (
 	"strings"
 )
 
-
 // Unmarshal the node, which must be a leaf node into v.
 // If v is not a struct pointer, Unmarshal will panic.
 func (bc Bconf) Unmarshal(v interface{}) (err error) {
-        s := reflect.ValueOf(v).Elem()
+	s := reflect.ValueOf(v).Elem()
 	st := s.Type()
 	for i := 0; i < s.NumField(); i++ {
 		f := s.Field(i)
 		if !f.CanSet() {
-			continue;
+			continue
 		}
 
 		name := st.Field(i).Name

@@ -60,7 +60,7 @@ func TestGet(t *testing.T) {
 }
 
 func TestForeachNode(t *testing.T) {
-	bc := ld(t).GetNode("some", "node");
+	bc := ld(t).GetNode("some", "node")
 	nodes := make(map[string]bool)
 	nodes["1"] = true
 	nodes["2"] = true
@@ -73,7 +73,7 @@ func TestForeachNode(t *testing.T) {
 		i++
 	})
 	if i != 3 {
-		t.Errorf("missing nodes: %d/3", i + 1)
+		t.Errorf("missing nodes: %d/3", i+1)
 	}
 }
 
@@ -93,7 +93,7 @@ func TestForeachVal(t *testing.T) {
 }
 
 func TestForeachSortedNode(t *testing.T) {
-	bc := ld(t).GetNode("some", "node");
+	bc := ld(t).GetNode("some", "node")
 	i := 0
 	bc.ForeachSortedNode(func(n string, b bconf.Bconf) {
 		i++
@@ -103,7 +103,7 @@ func TestForeachSortedNode(t *testing.T) {
 	})
 
 	if i != 3 {
-		t.Errorf("missing nodes: %d/3", i + 1)
+		t.Errorf("missing nodes: %d/3", i+1)
 	}
 }
 
@@ -165,11 +165,12 @@ func TestMerge(t *testing.T) {
 }
 
 type S struct {
-	Str	string	`bconf:"s"`
-	I	int
-	F	float64
-	U	uint
+	Str string `bconf:"s"`
+	I   int
+	F   float64
+	U   uint
 }
+
 var unbconf = `
 this.is.s=string
 this.is.i=-4711
@@ -211,6 +212,6 @@ func BenchmarkJSON(b *testing.B) {
 		bc := make(bconf.Bconf)
 		if err := bc.LoadJson([]byte(testjson)); err != nil {
 			b.Fatalf("LoadJson: %v", err)
-		}		
+		}
 	}
 }

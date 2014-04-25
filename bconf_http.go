@@ -4,9 +4,9 @@
 package bconf
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
-	"fmt"
 )
 
 func (bc *Bconf) LoadHTTP(bconfurl, host, appl string) error {

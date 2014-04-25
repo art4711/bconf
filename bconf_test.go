@@ -17,7 +17,16 @@ var testdata = `
 
 node.1=foo
 node.2=bar
-a.a.a.a.a=b`
+a.a.a.a.a=b
+some.node.3.a=a
+some.node.3.b=b
+some.node.3.c=c
+some.node.1.a=a
+some.node.1.b=b
+some.node.1.c=c
+some.node.2.a=a
+some.node.2.b=b
+some.node.2.c=c`
 
 func lj(t *testing.T) bconf.Bconf {
 	bc := make(bconf.Bconf)
@@ -50,6 +59,24 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestForeachNode(t *testing.T) {
+	bc := ld(t).GetNode("some", "node");
+	nodes := make(map[string]bool)
+	nodes["1"] = true
+	nodes["2"] = true
+	nodes["3"] = true
+	i := 0
+	bc.ForeachNode(func(n string, b bconf.Bconf) {
+		if _, ok := nodes[n]; !ok {
+			t.Errorf("node %s not in map", n)
+		}
+		i++
+	})
+	if i != 3 {
+		t.Errorf("missing nodes: %d/3", i + 1)
+	}
+}
+
 func TestForeachVal(t *testing.T) {
 	bc := lj(t)
 	n := bc.GetNode("conf")
@@ -65,11 +92,26 @@ func TestForeachVal(t *testing.T) {
 	})
 }
 
-func TestForeachSorted(t *testing.T) {
+func TestForeachSortedNode(t *testing.T) {
+	bc := ld(t).GetNode("some", "node");
+	i := 0
+	bc.ForeachSortedNode(func(n string, b bconf.Bconf) {
+		i++
+		if n != fmt.Sprint(i) {
+			t.Errorf("out of order nodes: %v != %v", n, i)
+		}
+	})
+
+	if i != 3 {
+		t.Errorf("missing nodes: %d/3", i + 1)
+	}
+}
+
+func TestForeachSortedVal(t *testing.T) {
 	bc := lj(t)
 	n := bc.GetNode("attr", "order")
 	i := 0
-	n.ForeachSorted(func(k, v string) {
+	n.ForeachSortedVal(func(k, v string) {
 		if fmt.Sprint(i) != k {
 			t.Errorf("out of order keys: %v != %v", i, k)
 		}

@@ -64,8 +64,19 @@ func (bc Bconf) GetString(k ...string) string {
 	return ""
 }
 
+// Call the callback function for every node under a Bconf node. The nodes are unsorted.
+// When the walk has to be sorted, use ForeachSortedNode instead which is slower.
+func (bc Bconf) ForeachNode(f func (name string, bc Bconf)) {
+	for n, v := range bc {
+		if b, ok := v.(Bconf); ok {
+			f(n, b)
+		}
+	}
+}
+
+
 // Call the callback function for every value (not node) in a Bconf node. The values are unsorted.
-// When the walk has to be sorted, use ForeachSorted instead which is slower.
+// When the walk has to be sorted, use ForeachSortedVal instead which is slower.
 func (bc Bconf) ForeachVal(f func(k, v string)) {
 	for k, v := range bc {
 		if s, ok := v.(string); ok {

@@ -34,9 +34,18 @@ func (bc Bconf) tosortednode() sortednode {
 	return sn
 }
 
+// Call the callback function for every node under a Bconf node. The nodes are sorted on their name.
+// When the walk doesn't need to be sorted, used ForeachNode instead which is faster.
+func (bc Bconf) ForeachSortedNode(f func(name string, bc Bconf)) {
+	sn := bc.tosortednode()
+	for _, v := range sn {
+		f(v.k, v.v.(Bconf))
+	}
+}
+
 // Call the callback function for every value (not node) in a Bconf node. The values are sorted on their key.
 // When the walk doesn't need to be sorted, use ForeachVal instead which is faster.
-func (bc Bconf) ForeachSorted(f func(k, v string)) {
+func (bc Bconf) ForeachSortedVal(f func(k, v string)) {
 	sn := bc.tosortednode()
 	for _, s := range sn {
 		if sv, ok := s.v.(string); ok {
